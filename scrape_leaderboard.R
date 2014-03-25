@@ -25,7 +25,7 @@ for(i in 1:877){
     scores[,rank  := as.integer(sub(" .*", "", rank_score))]
     scores[,score := as.integer(gsub(".*\\(|\\).*", "", rank_score))]
     
-    scores$links <- xpathSApply( page, "//td[@class='name']/a/@href")
+    scores$url <- xpathSApply( page, "//td[@class='name']/a/@href")
     
     scores.bind <- rbindlist(list(scores.bind, scores))    
     message(i, " : ", nrow(scores.bind))
