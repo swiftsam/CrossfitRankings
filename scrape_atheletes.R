@@ -7,8 +7,10 @@ library(stringr)
 
 load("data/leaderboard.RData")
 
-for(i in 1:nrow(scores.bind)){
-  url <- scores.bind[i, url]
+urls <- sort(unique(scores.bind$url))
+
+for(i in 1:length(urls)){
+  url <- urls[i]
   url.vector <- strsplit(url,"/")[[1]]
   id  <- url.vector[length(url.vector)]
   resp <- GET(url)  
@@ -45,6 +47,9 @@ for(i in 1:nrow(scores.bind)){
       athletes <- athlete
     }
     if(i%%100 == 0){
+      if(file.exists(paste("data/athletes_",i-2,".RData", sep=""))){
+        file.remove(paste("data/athletes_",i-2,".RData", sep=""))
+      }
       save(athletes, file=paste("data/athletes_",i,".RData", sep=""))      
     }
   }
