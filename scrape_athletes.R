@@ -50,6 +50,7 @@ for(i in 1:length(urls)){
       if(file.exists(paste("data/athletes_",i-2,".RData", sep=""))){
         file.remove(paste("data/athletes_",i-2,".RData", sep=""))
       }
+      message("done with ", i)
       save(athletes, file=paste("data/athletes_",i,".RData", sep=""))      
     }
   }
