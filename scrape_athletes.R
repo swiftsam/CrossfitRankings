@@ -27,15 +27,15 @@ ids <- sort(
                 return(id)
         }))))
 
+if(exists("athletes")){
+  ids <- setdiff(ids, athletes$id)
+}
+
 ScrapeAthletes <- function(start.i = 1, 
                            end.i   = length(ids)){
-  
   # identify IDs in the desired range which are not already scraped
   ids.loop <- ids[start.i:end.i]
-  if(exists("athletes")){
-    ids.loop <- setdiff(ids.loop, athletes$id)
-  }
-  
+
   # loop through IDs we don't have yet
   for(i in 1:length(ids.loop)){
     id <- ids.loop[i]
