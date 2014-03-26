@@ -73,7 +73,7 @@ ScrapeAthletes <- function(start.i = 1,
         athletes <- athlete
       }
       if(i%%100 == 0){
-        message("done with i:", i," id:",id)
+        message(Sys.time(), " done with i:", i," id:",id, " total records:",nrow(athletes))
         save(athletes, file=paste("data/athletes.RData", sep=""))  
       }
     }
