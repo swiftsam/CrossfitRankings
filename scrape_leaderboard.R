@@ -32,7 +32,9 @@ for(div in boards$division){
         message(Sys.time(), " division ",div," i:",i)
         save(leaderboard, file=paste("data/leaderboard.RData", sep=""))  
       }
+    } else {
+      message("failed to GET div",div," page ",i)
     }
-  }    
+  }
 }
 save(leaderboard, file="data/leaderboard.RData")

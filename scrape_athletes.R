@@ -5,30 +5,18 @@ library(data.table)
 library(reshape2)
 library(stringr)
 
-if(file.exists("data/leaderboard.RData")){
-  load("data/leaderboard.RData")  
+if(file.exists("data/athlete_ids.RData")){
+  load("data/athlete_ids.RData")  
 } else {
-  stop("Can't find leaderbord data")  
+  stop("Can't find ids data")  
 }
 
 if(file.exists("data/athletes.RData")){
   load("data/athletes.RData")  
 }
 
-urls <- unique(scores.bind$url)
-ids <- sort(
-        as.numeric(
-          unlist(
-            lapply(
-              unique(scores.bind$url), 
-              function(url){ 
-                url.vector <- strsplit(url,"/")[[1]]
-                id <- url.vector[length(url.vector)]
-                return(id)
-        }))))
-
 if(exists("athletes")){
-  ids <- setdiff(ids, athletes$id)
+  ids <- setdiff(athlete.ids$id, athletes$id)
 }
 
 ScrapeAthletes <- function(start.i = 1, 
