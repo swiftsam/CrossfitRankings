@@ -17,6 +17,7 @@ leaderboard$id <-  as.numeric(
 athlete.ids <- leaderboard[,list(id,name,url)]
 leaderboard$url <- NULL
 leaderboard$name <- NULL
+setkey(athlete.ids, id)
 save(athlete.ids, file="data/athlete_ids.RData")
 
 leaderboard <- data.table(melt(leaderboard, id.vars="id", value.name="rank_score", variable.name="wod"))
