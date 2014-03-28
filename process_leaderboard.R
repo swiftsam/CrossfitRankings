@@ -2,7 +2,7 @@ library(data.table)
 library(reshape2)
 library(stringr)
 
-load("data/leaderboard.RData")
+load("data/leaderboard.raw.RData")
 
 leaderboard$id <-  as.numeric(
                           unlist(
@@ -20,11 +20,15 @@ leaderboard$name <- NULL
 setkey(athlete.ids, id)
 save(athlete.ids, file="data/athlete_ids.RData")
 
-leaderboard <- data.table(melt(leaderboard, id.vars="id", value.name="rank_score", variable.name="wod"))
+leaderboard <- data.table(melt(leaderboard, 
+                               id.vars       = "id", 
+                               value.name    = "rank_score", 
+                               variable.name = "wod"))
 
 leaderboard[rank_score == "--\n                No score", rank_score:=NA]
 leaderboard[,rank  := as.integer(sub(" .*", "", rank_score))]
 leaderboard[,score := as.integer(gsub(".*\\(|\\).*", "", rank_score))]
+leaderboard$rank_score <- NULL
 
 save(leaderboard, file="data/leaderboard.RData")
 

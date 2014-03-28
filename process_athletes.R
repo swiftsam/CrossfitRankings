@@ -11,9 +11,9 @@
 #                            athletes.finzi,
 #                            athletes.swiftnode,
 #                            athletes.gordo))
-
+# 
 # athletes <- unique(athletes)
-# save(athletes, file="data/athletes.RData")
+# save(athletes, file="data/athletes.raw.RData")
 
 library(ggplot2)
 library(data.table)
@@ -58,7 +58,7 @@ MinSecToSec <- function(str.val){
   }
 }
 
-load("data/athletes.RData")
+load("data/athletes.raw.RData")
 
 #replace --'s with NA's
 for (col in names(athletes)){

@@ -37,4 +37,4 @@ for(div in boards$division){
     }
   }
 }
-save(leaderboard, file="data/leaderboard.RData")
+save(leaderboard, file="data/leaderboard.raw.RData")

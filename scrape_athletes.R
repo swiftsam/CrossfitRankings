@@ -11,8 +11,8 @@ if(file.exists("data/athlete_ids.RData")){
   stop("Can't find ids data")  
 }
 
-if(file.exists("data/athletes.RData")){
-  load("data/athletes.RData")  
+if(file.exists("data/athletes.raw.RData")){
+  load("data/athletes.raw.RData")  
 }
 
 if(exists("athletes")){
@@ -63,10 +63,10 @@ ScrapeAthletes <- function(start.i = 1,
         }
         if(i%%100 == 0){
           message(Sys.time(), " done with i:", i," id:",id, " total records:",nrow(athletes))
-          save(athletes, file=paste("data/athletes.RData", sep=""))  
+          save(athletes, file=paste("data/athletes.raw.RData", sep=""))  
         }
       }
     }
   }
-  save(athletes, file=paste("data/athletes.RData", sep="")) 
+  save(athletes, file=paste("data/athletes.raw.RData", sep="")) 
 }
