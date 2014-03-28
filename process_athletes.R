@@ -96,6 +96,6 @@ athletes[33     >= candj    | candj    >= 600,    candj:= NA]
 athletes[33     >= snatch   | snatch   >= 400,    snatch:= NA]
 athletes[33     >= deadlift | deadlift >= 750,    deadlift:= NA]
 athletes[33     >= backsq   | backsq   >= 750,    backsq:= NA]
-athletes[1      >= pullups  | pullups  >= 150,    pullups:= NA]
+athletes[0      >= pullups  | pullups  >= 150,    pullups:= NA]
 
 save(athletes, file="data/athletes.RData")
