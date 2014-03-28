@@ -66,7 +66,7 @@ for (col in names(athletes)){
 }
 
 # fix data types and formatting
-athletes[, gender  := factor(gender, levels=c("Male","Female"))]
+athletes[, gender  := factor(gender, levels=c("Female","Male"))]
 athletes[, age     := as.integer(age)]
 athletes$height    <- unlist(lapply(athletes$height, DeUnitHeight))
 athletes$weight    <- unlist(lapply(athletes$weight, DeUnitWeight))
