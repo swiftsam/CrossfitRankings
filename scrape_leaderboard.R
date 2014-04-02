@@ -30,7 +30,7 @@ for(div in boards$division){
       }
       if(i%%10 == 0){
         message(Sys.time(), " division ",div," i:",i)
-        save(leaderboard, file=paste("data/leaderboard.RData", sep=""))  
+        save(leaderboard, file=paste("data/leaderboard.raw.RData", sep=""))  
       }
     } else {
       message("failed to GET div",div," page ",i)
