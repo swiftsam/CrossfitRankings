@@ -5,7 +5,7 @@ library(reshape2)
 library(stringr)
 
 boards <- data.table("division" = c(1,2),
-                     "pages"     = c(937,597))
+                     "pages"     = c(937,598))
 
 for(div in boards$division){
   for (i in 1:boards[division == div,pages]){
