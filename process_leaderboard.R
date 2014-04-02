@@ -2,6 +2,8 @@ library(data.table)
 library(reshape2)
 library(stringr)
 
+source("process_fns.R")
+
 load("data/leaderboard.raw.RData")
 
 leaderboard$id <-  as.numeric(
@@ -27,8 +29,13 @@ leaderboard <- data.table(melt(leaderboard,
 
 leaderboard[rank_score == "--\n                No score", rank_score:=NA]
 leaderboard[,rank  := as.integer(sub(" .*", "", rank_score))]
-leaderboard[,score := as.integer(gsub(".*\\(|\\).*", "", rank_score))]
+leaderboard[,score :=gsub(".*\\(|\\).*", "", rank_score)]
+leaderboard[leaderboard$wod == "wod5"]$score   <- unlist(lapply(leaderboard[leaderboard$wod == "wod5"]$score, MinSecToSec))
+leaderboard[,score:= as.integer(score)]
 leaderboard$rank_score <- NULL
+
+setkeyv(leaderboard, c("id","wod"))
+leaderboard <- unique(leaderboard)
 
 save(leaderboard, file="data/leaderboard.RData")
 
