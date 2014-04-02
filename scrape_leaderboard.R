@@ -10,7 +10,7 @@ boards <- data.table("division" = c(1,2),
 for(div in boards$division){
   for (i in 1:boards[division == div,pages]){
     resp <- GET(
-      paste("http://games.crossfit.com/scores/leaderboard.php?stage=4&sort=0&page=",i,"&division=",div,"&region=0&numberperpage=100&competition=0&frontpage=0&expanded=0&year=14&full=1&showtoggles=0&hidedropdowns=1&showathleteac=1&is_mobile=1", sep="")
+      paste("http://games.crossfit.com/scores/leaderboard.php?stage=5&sort=0&page=",i,"&division=",div,"&region=0&numberperpage=100&competition=0&frontpage=0&expanded=0&year=14&full=1&showtoggles=0&hidedropdowns=1&showathleteac=1&is_mobile=1", sep="")
     )  
     
     if (resp$status_code==200){
