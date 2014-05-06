@@ -10,6 +10,8 @@ leaderboard <- merge(leaderboard, athletes[,list(id, gender)], by="id", all.x=TR
 ### Histograms by WOD ###
 
 # 14.1 overall
+wod1 <- data.frame("x_min" = 0:10 * 45 + 1,
+                   "x_max" = 0:10 * 45 + 30)
 ggplot(leaderboard[wod=="wod1",], aes(score)) +
   geom_histogram(binwidth=1)+
   scale_x_continuous(limits = c(0,475),
@@ -18,13 +20,16 @@ ggplot(leaderboard[wod=="wod1",], aes(score)) +
   theme_bw(base_size=18)
 
 # 14.1 by gender
-ggplot(leaderboard[wod=="wod1" & !is.na(gender),], aes(score)) +
-  geom_histogram(aes(y=..density..), binwidth=1)+
+ggplot(leaderboard[wod=="wod1" & !is.na(gender),], 
+       aes(score, fill=gender)) +
+  geom_rect(aes(wod1, aes(xmin=x_min, xmax=x_max, ymin = 0, ymax=2000, fill = "grey60", alpha = 0.4))) +
+  geom_histogram(binwidth=1)+
   scale_x_continuous(limits = c(0,475),
                      breaks = seq(0,475,25))+
   labs(x="14.1 Score",y="# of Athletes") +
-  facet_grid(gender~.) +
-  theme_bw(base_size=18)
+  facet_grid(gender~., scales="free_y") +
+  theme_bw(base_size=18) +
+  theme(legend.position = "none")
 
 # 14.2 overall
 ggplot(leaderboard[wod=="wod2",], aes(score)) +
