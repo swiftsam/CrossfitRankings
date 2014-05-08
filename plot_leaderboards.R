@@ -21,7 +21,7 @@ wod1 <- data.frame("x_min" = 0:10 * 45 + 1,
 
 # 14.1 by gender
 ggplot(leaderboard[wod=="wod1" & !is.na(gender) & !is.na(score)]) +
-  geom_rect(data=wod1, aes(xmin=x_min, xmax=x_max), 
+  geom_rect(data=wod1, aes(xmin=x_min, xmax=x_max+1), 
             ymin=0, ymax=2000, alpha=0.2, fill="grey60") +
   geom_histogram(aes(x=score, fill=gender), binwidth=1)+
   scale_x_continuous(limits = c(0,475),
@@ -59,7 +59,7 @@ wod2 <- data.frame("x_min" = mins,
 
 # 14.2 by gender
 ggplot(leaderboard[wod=="wod2" & !is.na(gender),]) +
-  geom_rect(data=wod2, aes(xmin=x_min, xmax=x_max), 
+  geom_rect(data=wod2, aes(xmin=x_min, xmax=x_max+1), 
             ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
   geom_histogram(aes(x=score, fill=gender), binwidth=1)+
   scale_x_continuous(limits = c(0,300),
@@ -94,7 +94,7 @@ wod3 <- data.frame("x_min" = mins,
 
 # 14.3 by gender
 ggplot(leaderboard[wod=="wod3" & !is.na(gender),]) +
-  geom_rect(data=wod3, aes(xmin=x_min, xmax=x_max), 
+  geom_rect(data=wod3, aes(xmin=x_min, xmax=x_max+1), 
             ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
   geom_histogram(aes(x=score, fill=gender), binwidth=1)+
   scale_x_continuous(limits = c(0,200),
@@ -118,8 +118,8 @@ wod4 <- data.frame("x_min" = c(61,151,201),
 
 # 14.4 by gender
 ggplot(leaderboard[wod=="wod4" & !is.na(gender),]) +
-  geom_rect(data=wod4, aes(xmin=x_min, xmax=x_max), 
-            ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
+  geom_rect(data=wod4, aes(xmin=x_min, xmax=x_max+1), 
+            ymin=0, ymax=20000, alpha=0.2, fill="grey60") +
   geom_histogram(aes(x=score, fill=gender), binwidth=1)+
   scale_x_continuous(limits = c(60,280),
                      breaks = seq(0,280,10))+
@@ -142,7 +142,7 @@ ggsave(filename="crossfit_14.4_hist_gender.png",width=10, height=6)
 wod5 <- data.frame("x_min" = seq(600,3000,600),
                    "x_max" = seq(900,3300,600))
 ggplot(leaderboard[wod=="wod5" & !is.na(gender),]) +
-  geom_rect(data=wod5, aes(xmin=x_min, xmax=x_max), 
+  geom_rect(data=wod5, aes(xmin=x_min, xmax=x_max+1), 
             ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
   geom_histogram(aes(x=score, fill=gender), binwidth=1)+
   scale_x_continuous(limits = c(420,3600),
