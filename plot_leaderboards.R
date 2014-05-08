@@ -153,3 +153,21 @@ ggplot(leaderboard[wod=="wod5" & !is.na(gender),]) +
   theme_bw(base_size=14) +
   theme(legend.position = "none")
 ggsave(filename="crossfit_14.5_hist_gender.png",width=10, height=6)
+
+# 14.5 by height and gender
+leaderboard <- merge(leaderboard, athletes[, list(id,height)], by="id")
+ggplot(leaderboard[wod=="wod5" & height < 85], 
+       aes(height, score, color=gender)) + 
+  geom_point(shape=1, position="jitter") + 
+  geom_smooth(method="lm", size=2) +
+  scale_y_continuous(limits = c(420,3600),
+                     breaks = c(seq(480,3600, 300)),
+                     labels = c(seq(8,60,5))) +
+  scale_x_continuous(limits   = c(57,81),
+                     breaks   = seq(57,81,by=3),
+                     labels   = c("4\'9\"","5\'","5\'3\"","5\'6\"","5\'9\"","6\'","6\'3\"","6\'6\"","6\'9\"")) +
+  labs(x = "height", y="score (minutes)", title="Crossfit 14.5 scores by height and gender")+
+  theme_bw(base_size=14) +
+  theme(legend.position = "none")
+summary(lm(score ~ height, data = leaderboard[wod=="wod5" & height < 85 & gender == "Male"]))
+summary(lm(score ~ height, data = leaderboard[wod=="wod5" & height < 85 & gender == "Female"]))
