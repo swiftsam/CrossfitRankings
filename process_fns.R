@@ -1,7 +1,7 @@
 DeUnitWeight <- function(str.val){
   if(is.na(str.val)) {return(NA)}
-  unit  <- substr(str.val, 
-                  nchar(str.val)-1, 
+  unit  <- substr(str.val,
+                  nchar(str.val)-1,
                   nchar(str.val))
   value <- as.numeric(substr(str.val,
                              1, nchar(str.val)-3))
@@ -25,7 +25,7 @@ DeUnitHeight <- function(str.val){
   } else {
     return(NA)
   }
-  
+
 }
 
 MinSecToSec <- function(str.val){
