@@ -1,3 +1,5 @@
+library(RMySQL)
+
 QueryDB <- function(query       = NULL, 
                     db          = "crossfit",
                     silent      = TRUE){

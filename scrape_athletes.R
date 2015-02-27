@@ -1,9 +1,9 @@
 
 library(httr)
-library(XML)
 library(data.table)
 library(reshape2)
 library(stringr)
+library(rvest)
 
 if(file.exists("data/athlete_ids.RData")){
   load("data/athlete_ids.RData")
