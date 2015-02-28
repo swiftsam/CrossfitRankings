@@ -44,7 +44,7 @@ leaderboard.pages[, retrieved_datetime := NA]
 # write tables
 db.con <- dbConnect(RMySQL::MySQL(), 
                     dbname   = "crossfit",
-                    user     = "root",
+                    user     = "crossfit",
                     password = "",
                     host     = "127.0.0.1")
 

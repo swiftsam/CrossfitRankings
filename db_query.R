@@ -9,7 +9,7 @@ QueryDB <- function(query       = NULL,
   # create database connection
   db.con <- dbConnect(RMySQL::MySQL(), 
                       dbname   = db,
-                      user     = "root",
+                      user     = "crossfit",
                       password = "",
                       host     = "127.0.0.1")
   # run query
