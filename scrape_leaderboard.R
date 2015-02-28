@@ -6,6 +6,8 @@ library(rvest)
 source("process_fns.R")
 source("db_query.R")
 
+#leaderboard.2015 <- html("http://games.crossfit.com/scores/leaderboard.php?stage=1&sort=1&page=1&division=1&region=0&numberperpage=100&competition=0&frontpage=0&expanded=0&year=15&full=1&showtoggles=0&hidedropdowns=1&showathleteac=1&is_mobile=1")
+
 GetLeaderboardPage <- function(year = 14, division = 1, stage = 5, page = 1, score.type = "points"){
 
   html.page <- html(paste0(

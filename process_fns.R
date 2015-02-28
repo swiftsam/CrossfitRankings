@@ -1,5 +1,5 @@
 DeUnitWeight <- function(str.val){
-  if(is.na(str.val)) {return(NA)}
+  if(str.val %in% c("--","", NA)) {return(NA)}
   unit  <- substr(str.val,
                   nchar(str.val)-1,
                   nchar(str.val))
@@ -13,7 +13,8 @@ DeUnitWeight <- function(str.val){
 }
 
 DeUnitHeight <- function(str.val){
-  if(is.na(str.val)) {return(NA)}
+  if(str.val %in% c("--","", NA)) {return(NA)}
+  
   n.char <- nchar(str.val)
   if(substr(str.val,2,2) == "'"){
     feet <- as.numeric(substr(str.val,1,1))
@@ -29,7 +30,7 @@ DeUnitHeight <- function(str.val){
 }
 
 MinSecToSec <- function(str.val){
-  if(is.na(str.val) | str.val == "0:00") {return(NA)}
+  if(str.val %in% c("--","","0:00",NA)) {return(NA)}
   vec.val <- strsplit(str.val,split=":")[[1]]
   if(length(vec.val) == 2){
     return(as.numeric(vec.val[1])*60 + as.numeric(vec.val[2]))
