@@ -59,9 +59,9 @@ GetLeaderboardPage <- function(year = 14, division = 1, stage = 5, page = 1, sco
   
   leaderboard[, rank_score := scores]
   
-  leaderboard[rank_score == "--\n                No score", rank_score:=NA]
+  leaderboard[rank_score == "--\n                No score", rank_score := NA]
   leaderboard[,rank  := as.integer(sub(" .*", "", rank_score))]
-  leaderboard[,score_pre :=gsub(".*\\(|\\).*", "", rank_score)]
+  leaderboard[,score_pre := unlist(str_split(rank_score, "[\\(\\)]"))[2], by=athlete_id]
 
   if(score.type == "points"){
     leaderboard[, score := as.integer(score_pre), by=athlete_id]
