@@ -1,5 +1,21 @@
 library(data.table)
 library(RMySQL)
+library(rvest)
+
+GetPageCount <- function(year = 14, division = 1, stage = 0){
+  #get page count
+  
+  url <- paste0(
+    "http://games.crossfit.com/scores/leaderboard.php?stage=",stage,"&sort=",stage,
+    "&page=0&division=",division,"&region=0&numberperpage=100&competition=0&frontpage=0",
+    "&expanded=0&year=",year,"&full=1&showtoggles=0&hidedropdowns=1",
+    "&showathleteac=1&is_mobile=1")
+  #message(url)
+  html.page <- html(url)
+  page.count <- as.integer(html_text(html_nodes(html.page, "div#leaderboard-pager a.button")[[1]]))
+  message(page.count)
+  return(page.count)
+}
 
 # generate table of leaderboard pages
 boards <- rbindlist(list(
