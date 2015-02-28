@@ -82,7 +82,7 @@ for(i in 1:pages[,.N]){
     # write new leaderboard records
     db.con <- dbConnect(RMySQL::MySQL(), 
                         dbname   = "crossfit",
-                        user     = "root",
+                        user     = "crossfit",
                         password = "",
                         host     = "127.0.0.1")
     
