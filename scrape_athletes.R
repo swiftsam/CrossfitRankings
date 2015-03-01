@@ -69,10 +69,12 @@ athletes.done <- QueryDB("SELECT athlete_id
 
 athletes <- athletes.all[!athlete_id %in% athletes.done[,athlete_id], athlete_id]
 
+message(Sys.time(), " starting with ", length(athletes), " athletes to scrape")
+
 for(athlete_id in athletes){
   message(Sys.time(), " Athlete: ", athlete_id)
   
-  athlete <- GetAthlete(athlete_id)
+    athlete <- GetAthlete(athlete_id)
   
   if(!is.null(athlete)) {
     # write new leaderboard records
