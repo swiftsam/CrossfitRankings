@@ -24,13 +24,13 @@ ScrapeAtheletesByYear <- function(year){
   
   message(Sys.time(), " starting with ", length(athletes), " athletes to scrape")
   
-  db.con <- dbConnect(RMySQL::MySQL(), 
-                      dbname   = "crossfit",
-                      user     = "crossfit",
-                      password = "",
-                      host     = "127.0.0.1")
-  
   foreach(i = 1:length(athletes)) %dopar% {
+    
+    db.con <- dbConnect(RMySQL::MySQL(), 
+                        dbname   = "crossfit",
+                        user     = "crossfit",
+                        password = "",
+                        host     = "127.0.0.1")
     athlete_id <- athletes[i]
     message(Sys.time(), " Athlete: ", athlete_id)
     
@@ -39,7 +39,8 @@ ScrapeAtheletesByYear <- function(year){
     if(!is.null(athlete)) {
       dbWriteTable(db.con, name = "athletes", value=athlete, row.names = F, append=TRUE)
     }
+    
+    dbDisconnect(db.con)
   }
-  dbDisconnect(db.con)
 }
 
