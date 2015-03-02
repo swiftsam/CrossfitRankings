@@ -4,6 +4,10 @@ library(stringr)
 library(rvest)
 library(XML)
 
+library(foreach)
+library(doMC)
+doMC::registerDoMC()
+
 source("process_fns.R")
 source("scrape_fns.R")
 source("db_query.R")
@@ -20,23 +24,22 @@ ScrapeAtheletesByYear <- function(year){
   
   message(Sys.time(), " starting with ", length(athletes), " athletes to scrape")
   
-  for(athlete_id in athletes){
+  db.con <- dbConnect(RMySQL::MySQL(), 
+                      dbname   = "crossfit",
+                      user     = "crossfit",
+                      password = "",
+                      host     = "127.0.0.1")
+  
+  foreach(i = 1:length(athletes)) %dopar% {
+    athlete_id <- athletes[i]
     message(Sys.time(), " Athlete: ", athlete_id)
     
     athlete <- GetAthlete(athlete_id)
     
     if(!is.null(athlete)) {
-      # write new leaderboard records
-      db.con <- dbConnect(RMySQL::MySQL(), 
-                          dbname   = "crossfit",
-                          user     = "crossfit",
-                          password = "",
-                          host     = "127.0.0.1")
-      
       dbWriteTable(db.con, name = "athletes", value=athlete, row.names = F, append=TRUE)
-      
-      dbDisconnect(db.con)
     }
-  }  
+  }
+  dbDisconnect(db.con)
 }
 
