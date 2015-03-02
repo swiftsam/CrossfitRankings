@@ -118,7 +118,8 @@ GetAthlete <- function(athlete_id){
     "background" = paste(background, collapse="|"),
     "experience" = paste(experience, collapse="|"),
     "schedule"   = paste(schedule, collapse="|"),
-    "howlong"    = paste(howlong, collapse="|"))
+    "howlong"    = paste(howlong, collapse="|"),
+    "retrieved_datetime" = Sys.time())
   
   return(athlete)
 }
