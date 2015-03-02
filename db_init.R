@@ -2,9 +2,12 @@ library(data.table)
 library(RMySQL)
 library(rvest)
 
+source("db_query.R")
+
 GetPageCount <- function(year = 14, division = 1, stage = 0){
-  #get page count
-  
+  if(year == 15 & stage == 1.1) {
+    stage <- 1
+  }
   url <- paste0(
     "http://games.crossfit.com/scores/leaderboard.php?stage=",stage,"&sort=",stage,
     "&page=0&division=",division,"&region=0&numberperpage=100&competition=0&frontpage=0",
@@ -17,40 +20,68 @@ GetPageCount <- function(year = 14, division = 1, stage = 0){
   return(page.count)
 }
 
-# generate table of leaderboard pages
-boards <- rbindlist(list(
-  data.table(year = 12, division = 1, stage = 0:5),
-  data.table(year = 12, division = 2, stage = 0:5),
-  data.table(year = 13, division = 1, stage = 0:5),
-  data.table(year = 13, division = 2, stage = 0:5),
-  data.table(year = 14, division = 1, stage = 0:5),
-  data.table(year = 14, division = 2, stage = 0:5)))
-
-boards[, id :=1:.N]
-boards[, pages := GetPageCount(year = year,division = division,stage = stage), by=id]
-
-ExpandBoard <- function(i){  
+ExpandBoard <- function(i, boards){  
   data.table(year = boards[i, year],
              division = boards[i,division],
              stage = boards[i, stage],
              pages = 1:boards[i,pages])
 }
 
-leaderboard.pages <- rbindlist(lapply(boards[, id], ExpandBoard))
+InitAllYears <-function(){
+  # generate table of leaderboard pages
+  boards <- rbindlist(list(
+    data.table(year = 12, division = 1, stage = 0:5),
+    data.table(year = 12, division = 2, stage = 0:5),
+    data.table(year = 13, division = 1, stage = 0:5),
+    data.table(year = 13, division = 2, stage = 0:5),
+    data.table(year = 14, division = 1, stage = 0:5),
+    data.table(year = 14, division = 2, stage = 0:5),
+    data.table(year = 15, division = 1, stage = c(1,1.1)),
+    data.table(year = 15, division = 2, stage = c(1,1.1))))
+  
+  boards[, id :=1:.N]
+  boards[, pages := GetPageCount(year = year,division = division,stage = stage), by=id]
+  
+  leaderboard.pages <- rbindlist(lapply(boards[, id], ExpandBoard, boards = boards))
+  
+  leaderboard.pages[, retrieved_datetime := NA]
+  
+  # write tables
+  db.con <- dbConnect(RMySQL::MySQL(), 
+                      dbname   = "crossfit",
+                      user     = "crossfit",
+                      password = "",
+                      host     = "127.0.0.1")
+  
+  dbWriteTable(db.con, name = "leaderboard_pages", value=leaderboard.pages, row.names=F)
+  dbDisconnect(db.con)
+}
 
-leaderboard.pages[, retrieved_datetime := NA]
-#leaderboard.pages[year == 14, retrieved_datetime := Sys.time() - 365*24*60*60]
+Init15Wod <- function(stage){
+  boards <- data.table(year = 15, division = 1:2, stage = stage)
+  
+  boards[, id :=1:.N]
+  boards[, pages := GetPageCount(year = year,division = division,stage = stage), by=id]
+  
+  leaderboard.pages <- rbindlist(lapply(boards[, id], ExpandBoard, boards))
+  
+  leaderboard.pages[, retrieved_datetime := NA]
+  
+  # write tables
+  db.con <- dbConnect(RMySQL::MySQL(), 
+                      dbname   = "crossfit",
+                      user     = "crossfit",
+                      password = "",
+                      host     = "127.0.0.1")
+  
+  QueryDB(paste0("DELETE FROM leaderboard_pages WHERE year = 15 AND stage = ", stage))
+  QueryDB(paste0("DELETE FROM leaderboard WHERE year = 15 AND stage = ", stage))
+  
+  dbWriteTable(db.con, name = "leaderboard_pages", value=leaderboard.pages, row.names=F, append=TRUE)
+  dbDisconnect(db.con)
+  
+}
 
-# write tables
-db.con <- dbConnect(RMySQL::MySQL(), 
-                    dbname   = "crossfit",
-                    user     = "crossfit",
-                    password = "",
-                    host     = "127.0.0.1")
 
-#dbWriteTable(db.con, name = "athletes",    value=athletes,    row.names = F)
-#dbWriteTable(db.con, name = "leaderboard", value=leaderboard, row.names = F)
-dbWriteTable(db.con, name = "leaderboard_pages", value=leaderboard.pages, row.names=F)
-dbDisconnect(db.con)
 
 
