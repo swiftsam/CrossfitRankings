@@ -5,7 +5,7 @@ library(rvest)
 library(XML)
 
 source("process_fns.R")
-source("scape_fns.R")
+source("scrape_fns.R")
 source("db_query.R")
 
 ScrapeAtheletesByYear <- function(year){
