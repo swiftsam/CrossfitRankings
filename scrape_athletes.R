@@ -15,7 +15,8 @@ source("db_query.R")
 ScrapeAtheletesByYear <- function(year){
   athletes.year <- QueryDB(paste0("SELECT DISTINCT athlete_id
                                   FROM leaderboard
-                                  WHERE year = ", year))
+                                  WHERE score IS NOT NULL
+                                  AND year = ", year))
   
   athletes.db <- QueryDB("SELECT athlete_id
                           FROM athletes;")
