@@ -45,6 +45,8 @@ if(pages[, .N] == 0){
       dbDisconnect(db.con)
       
       message(Sys.time(), " Success! year: ",year," div: ",division," stage: ",stage," page: ",page)
+    } else {
+      message(Sys.time(), " Failure! year: ",year," div: ",division," stage: ",stage," page: ",page)
     }
   } 
 }

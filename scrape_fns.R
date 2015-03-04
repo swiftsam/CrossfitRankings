@@ -14,6 +14,9 @@ GetLeaderboardPage <- function(year = 14, division = 1, stage = 5, page = 1, sco
   
   #athletes     <- html_text(html_nodes(html.page, "td.name"))
   athlete.urls <- html_attr(html_nodes(html.page, "td.name a"), "href")
+  if(length(athlete.urls) == 0){
+    return(NULL)
+  }
   
   GetAthleteID <- function(url){ 
     url.vector <- strsplit(url,"/")[[1]]
