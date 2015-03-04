@@ -1,7 +1,16 @@
 CrossfitRankings
 ================
+Scraping and analysis of the Crossfit Open scores
 
-Scraping and analysis of the crossfit open scores and ranking system
+General flow of data collection and analysis
+
+1. DB Setup and scraping queue building
+  * db_init.R
+2. Scraping
+  * scrape_leaderboard.R
+  * scrape_athletes.R
+3. Analysis
+  * analysis_
 
 Post(s):
 
