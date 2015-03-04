@@ -40,14 +40,15 @@ ScrapeAtheletesByYear <- function(year){
                         password = "",
                         host     = "127.0.0.1")
     athlete_id <- athletes.todo[i]
-    message(Sys.time(), " Athlete: ", athlete_id)
     
     athlete <- GetAthlete(athlete_id)
     
     if(!is.null(athlete)) {
+      message(Sys.time(), " Success! Athlete: ", athlete_id)
       dbWriteTable(db.con, name = "athletes", value=athlete, row.names = F, append=TRUE)
+    } else {
+      message(Sys.time(), " ** Fail! Athlete: ", athlete_id)
     }
-    
     dbDisconnect(db.con)
   }
 }

@@ -6,17 +6,16 @@ library(rvest)
 GetLeaderboardPage <- function(year = 14, division = 1, stage = 5, page = 1, score.type = "points"){
   
   
-  html.page <- html(paste0(
+  html.page <- tryCatch({html(paste0(
     "http://games.crossfit.com/scores/leaderboard.php?stage=",round(stage),"&sort=",round(stage),"&page=",page,
     "&division=",division,"&region=0&numberperpage=100&competition=0&frontpage=0",
     "&expanded=0&year=",year,"&full=1&showtoggles=0&hidedropdowns=1",
-    "&showathleteac=1&is_mobile=1"))  
+    "&showathleteac=1&is_mobile=1"))},
+    error = function(cond) { return(NULL) })
+    
   
   #athletes     <- html_text(html_nodes(html.page, "td.name"))
   athlete.urls <- html_attr(html_nodes(html.page, "td.name a"), "href")
-  if(length(athlete.urls) == 0){
-    return(NULL)
-  }
   
   GetAthleteID <- function(url){ 
     url.vector <- strsplit(url,"/")[[1]]
@@ -73,12 +72,14 @@ GetLeaderboardPage <- function(year = 14, division = 1, stage = 5, page = 1, sco
 }
 
 
-GetAthlete <- function(athlete_id){
+GetAthlete <- function(athlete.id){
   
-  profile.page <- html(paste0("http://games.crossfit.com/athlete/",athlete_id))
+  profile.page <- tryCatch({html(paste0(
+    "http://games.crossfit.com/athlete/",athlete.id))},
+    error = function(cond) { return(NULL) })
   
   if(html_text(html_nodes(profile.page, "h2#page-title")) == "Athlete: Not found"){
-    return(data.table("athlete_id" = athlete_id))
+    return(data.table("athlete_id" = athlete.id))
   }
   
   labels  <- html_text(html_nodes(profile.page, "div.profile-details dl dt"))
@@ -95,7 +96,7 @@ GetAthlete <- function(athlete_id){
   
   
   athlete <- data.table(
-    "athlete_id" = athlete_id,
+    "athlete_id" = athlete.id,
     "name"       = substring(html_text(html_nodes(profile.page, "h2#page-title")),10),
     "region"     = paste(demo[which(labels == "Region:")],"",sep=""),
     "team"       = paste(demo[which(labels == "Team:")],"", sep=""),

@@ -46,7 +46,7 @@ if(pages[, .N] == 0){
       
       message(Sys.time(), " Success! year: ",year," div: ",division," stage: ",stage," page: ",page)
     } else {
-      message(Sys.time(), " Failure! year: ",year," div: ",division," stage: ",stage," page: ",page)
+      message(Sys.time(), " ** Fail! year: ",year," div: ",division," stage: ",stage," page: ",page)
     }
   } 
 }
