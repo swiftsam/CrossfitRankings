@@ -5,6 +5,26 @@ library(data.table)
 load("data/athletes.RData")
 load("data/leaderboard.RData")
 
+#replace --'s with NA's
+for (col in names(athletes)){
+  athletes[(get(col)=="--"), (col) := NA]
+}
+
+# remove spurious values
+athletes[12*4.5 >= height   | height   >= 12*7.5, height:=NA]
+athletes[80     >= weight   | weight   >= 500,    weight:=NA]
+athletes[60     >= fran     | fran     >= 1200,   fran:= NA]
+athletes[60     >= helen    | helen    >= 2400,   helen:= NA]
+athletes[30     >= grace    | grace    >= 1200,   grace:= NA]
+athletes[120    >= filthy50 | filthy50 >= 5400,   filthy50:= NA]
+athletes[43     >= run400   | run400   >= 300,    run400:= NA]
+athletes[757    >= run5k    | run5k    >= 3600,   run5k:= NA]
+athletes[33     >= candj    | candj    >= 600,    candj:= NA]
+athletes[33     >= snatch   | snatch   >= 400,    snatch:= NA]
+athletes[33     >= deadlift | deadlift >= 750,    deadlift:= NA]
+athletes[33     >= backsq   | backsq   >= 750,    backsq:= NA]
+athletes[0      >= pullups  | pullups  >= 150,    pullups:= NA]
+
 ### Histograms by profile stats
 GenderHist <-function(variable, binwidth=1, limits, breaks, labels=breaks, xlab){
   ggplot(athletes, aes_string(x=variable, fill="gender")) +
