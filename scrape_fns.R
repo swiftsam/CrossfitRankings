@@ -13,9 +13,13 @@ GetLeaderboardPage <- function(year = 14, division = 1, stage = 5, page = 1, sco
     "&showathleteac=1&is_mobile=1"))},
     error = function(cond) { return(NULL) })
     
-  
-  #athletes     <- html_text(html_nodes(html.page, "td.name"))
+  if(!"HTMLInternalDocument" %in% class(html.page)) { 
+    return(NULL)
+  }
   athlete.urls <- html_attr(html_nodes(html.page, "td.name a"), "href")
+  if(length(athlete.urls) == 0){
+    return(NULL)
+  }
   
   GetAthleteID <- function(url){ 
     url.vector <- strsplit(url,"/")[[1]]
