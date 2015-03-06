@@ -3,8 +3,6 @@ library(reshape2)
 library(stringr)
 library(rvest)
 
-source("process_fns.R")
-
 GetLeaderboardPage <- function(year = 14, division = 1, stage = 5, page = 1, score.type = "points"){
   
   
@@ -84,25 +82,14 @@ GetAthlete <- function(athlete.id){
     "http://games.crossfit.com/athlete/",athlete.id))},
     error = function(cond) { return(NULL) })
   
-  title <- tryCatch({
-              html_text(html_nodes(profile.page, "h2#page-title"))},
-              error = function(cond) { return(NULL) })
-  if(title == "Athlete: Not found"){
+  if(html_text(html_nodes(profile.page, "h2#page-title")) == "Athlete: Not found"){
     return(data.table("athlete_id" = athlete.id))
   }
   
-  labels  <- tryCatch({
-                html_text(html_nodes(profile.page, "div.profile-details dl dt"))},
-                error = function(cond) { return(NULL) })
-  demo    <- tryCatch({
-                html_text(html_nodes(profile.page, "div.profile-details dl dd"))},
-                error = function(cond) { return(NULL) })
-  stats   <- tryCatch({
-                html_text(html_nodes(profile.page, "div.profile-stats td"))},
-                error = function(cond) { return(NULL) })
-  history <- tryCatch({
-                html_nodes(profile.page, "div.history")},
-                error = function(cond) { return(NULL) })
+  labels  <- html_text(html_nodes(profile.page, "div.profile-details dl dt"))
+  demo    <- html_text(html_nodes(profile.page, "div.profile-details dl dd"))
+  stats   <- html_text(html_nodes(profile.page, "div.profile-stats td"))
+  history    <- html_nodes(profile.page, "div.history")
   
   eat        <- c(html_text(html_nodes(history[[1]], "h4")),"")
   train      <- c(html_text(html_nodes(history[[2]], "h4")),"")
