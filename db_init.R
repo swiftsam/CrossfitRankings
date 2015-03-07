@@ -36,8 +36,8 @@ InitAllYears <-function(){
     data.table(year = 13, division = 2, stage = 0:5),
     data.table(year = 14, division = 1, stage = 0:5),
     data.table(year = 14, division = 2, stage = 0:5),
-    data.table(year = 15, division = 1, stage = c(1,1.1)),
-    data.table(year = 15, division = 2, stage = c(1,1.1))))
+    data.table(year = 15, division = 1, stage = c(1,1.1,2)),
+    data.table(year = 15, division = 2, stage = c(1,1.1,2))))
   
   boards[, id :=1:.N]
   boards[, pages := GetPageCount(year = year,division = division,stage = stage), by=id]
