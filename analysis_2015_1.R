@@ -1,8 +1,9 @@
 library(data.table)
 library(ggplot2)
+library(scales)
 
 # leaderboard <- QueryDB(SELECT * FROM leaderboard WHERE year == 15;)
-load("data/leaderboard.15.RData")
+load("data/leaderboard.combined.pull.RData")
 
 # create factors
 leaderboard[, gender := factor(division, levels=2:1, labels=c("Women","Men"), ordered=TRUE)]
@@ -13,7 +14,17 @@ leaderboard[, participated := factor(is.na(score), levels=c(F,T), labels=c("WOD'
 setkeyv(leaderboard, c("wod", "participated", "scaled", "athlete_id"))
 leaderboard <- unique(leaderboard)
 
+n.athletes <- leaderboard[, length(unique(athlete_id))]
+n.men      <- leaderboard[gender=="Men", length(unique(athlete_id))]
+n.women    <- leaderboard[gender=="Women", length(unique(athlete_id))]
+n.athletes
+n.women/n.athletes
+
 # drop outs
+leaderboard[, list(length(unique(athlete_id)) / n.athletes), by=participated]
+leaderboard[gender == "Men", list(length(unique(athlete_id)) / n.men), by=participated]
+leaderboard[gender == "Women", list(length(unique(athlete_id)) / n.women), by=participated]
+
 ggplot(leaderboard[wod == "15.1",
                    list( N = length(unique(athlete_id))), 
                    by=list(gender, participated)], 
@@ -31,12 +42,15 @@ ggplot(leaderboard[wod == "15.1",
 ggsave(filename="~/Desktop/crossfit_15.1_athlete_count.png",width=10, height=4)
 
 # plot Scaled vs RX
+leaderboard[participated == "WOD'd", list(length(unique(athlete_id)) / n.athletes), by=scaled]
+
 ggplot(leaderboard[!is.na(score) & wod == "15.1", 
                    .N, by=list(scaled, gender, wod)],
        aes(gender, N, fill=scaled)) + 
   geom_bar( stat="identity", position = "stack") + 
   geom_text(aes(label=N),position = "stack", hjust=1.2) + 
   scale_fill_manual(values=c("#a6cee3","#b2df8a")) + 
+  scale_y_continuous(breaks=seq(0,150000, 25000),labels=comma)+
   coord_flip() + 
   labs(y="Number of Athletes",
        x="",
@@ -97,7 +111,7 @@ ggplot(score.wide[!is.na(W15_1) & !is.na(W15_1A)],
                      limits=c(0,250)) + 
   facet_grid(gender~., scales="free") +
   theme_bw(base_size = 18)
-ggsave(filename="~/Desktop/crossfit_15.1v1A_scatter.png",width=10, height=6)
+ggsave(filename="~/Desktop/crossfit_15.1v1A_scatter.png",width=8, height=7)
 
 
 
