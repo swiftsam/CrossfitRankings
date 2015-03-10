@@ -1,3 +1,12 @@
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Summarize profile data from athletes in 2014 Open
+###
+### Notes:
+###  * uses data scraped by scrape_athletes.R and scrape_leaderboard.R
+###
+### Primary Creator(s): Sam Swift (samswift@gmail.com)
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 library(ggplot2)
 library(scales)
 library(data.table)

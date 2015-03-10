@@ -1,9 +1,24 @@
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Analysis of scores from 15.1
+###
+### Notes:
+###  * uses data scraped by scrape_athletes.R and scrape_leaderboard.R
+###  * used to create this post:
+###    swift.pw/data/wod-data-crossfit-open-15-1
+###
+### Primary Creator(s): Sam Swift (samswift@gmail.com)
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 library(data.table)
 library(ggplot2)
 library(scales)
 
-# leaderboard <- QueryDB(SELECT * FROM leaderboard WHERE year == 15;)
-load("data/leaderboard.combined.pull.RData")
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Load and Clean Data ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# binary data files saved from database using export_data.R
+load("data/leaderboard.15.RData")
 
 # create factors
 leaderboard[, gender := factor(division, levels=2:1, labels=c("Women","Men"), ordered=TRUE)]
@@ -13,6 +28,10 @@ leaderboard[, participated := factor(is.na(score), levels=c(F,T), labels=c("WOD'
 
 setkeyv(leaderboard, c("wod", "participated", "scaled", "athlete_id"))
 leaderboard <- unique(leaderboard)
+
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Descriptive Stats about Participation ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 n.athletes <- leaderboard[, length(unique(athlete_id))]
 n.men      <- leaderboard[gender=="Men", length(unique(athlete_id))]
@@ -25,6 +44,7 @@ leaderboard[, list(length(unique(athlete_id)) / n.athletes), by=participated]
 leaderboard[gender == "Men", list(length(unique(athlete_id)) / n.men), by=participated]
 leaderboard[gender == "Women", list(length(unique(athlete_id)) / n.women), by=participated]
 
+# plot of participation numbers by gender
 ggplot(leaderboard[wod == "15.1",
                    list( N = length(unique(athlete_id))), 
                    by=list(gender, participated)], 
@@ -61,7 +81,11 @@ ggplot(leaderboard[!is.na(score) & wod == "15.1",
 ggsave(filename="~/Desktop/crossfit_15.1_rx_scaled.png",width=10, height=4)
 
 
-# plot scores for 15.1
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Histogram of 15.1 scores by gender ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# define break points by WOD rep scheme
 rounds.151 <- data.frame("x_min" = c(1,61,121,181,241),
                          "x_max" = c(30,90,150,210,250)+1)
 moves.151 <- data.frame(xint = c(15,25,30,
@@ -86,7 +110,9 @@ ggplot(leaderboard[wod == "15.1" & scaled == "Rx"]) +
 ggsave(filename="~/Desktop/crossfit_15.1_wod.png",width=10, height=6)
 
 
-# plot scores for 15.1A
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Histogram of 15.1A scores by gender ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ggplot(leaderboard[wod == "15.1A" & scaled == "Rx"],
        aes(score, fill = gender)) + 
   geom_histogram(binwidth=5) + 

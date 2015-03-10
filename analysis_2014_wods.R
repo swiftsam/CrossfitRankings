@@ -1,3 +1,14 @@
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Analysis of scores on all 2014 Open WODs
+###
+### Notes:
+###  * uses data scraped by scrape_athletes.R and scrape_leaderboard.R
+###  * used to create this post:
+###    swift.pw/data/where-did-you-really-stack-up-in-the-2014-open-wods
+###
+### Primary Creator(s): Sam Swift (samswift@gmail.com)
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 library(ggplot2)
 library(scales)
 library(data.table)

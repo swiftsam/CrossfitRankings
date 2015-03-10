@@ -1,7 +1,22 @@
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Analysis of scores from 15.2
+###
+### Notes:
+###  * uses data scraped by scrape_athletes.R and scrape_leaderboard.R
+###  * used to create this post:
+###    swift.pw/data/wod-data-crossfit-open-15-2
+###
+### Primary Creator(s): Sam Swift (samswift@gmail.com)
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 library(data.table)
 library(reshape2)
 library(ggplot2)
 
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Load and Clean Data ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# binary data files saved from database using export_data.R
 load("data/leaderboard.14.RData")
 load("data/leaderboard.15.RData")
 load("data/athletes.RData")
@@ -15,7 +30,11 @@ leaderboard.15[, participated := factor(is.na(score), levels=c(F,T), labels=c("W
 setkeyv(leaderboard.15, c("wod", "participated", "scaled", "athlete_id"))
 leaderboard.15 <- unique(leaderboard.15)
 
-# 15.2 Rx
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 15.2 Rx Plot ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Identify break points for 15.2 based on rep scheme
 rep.ct   <- 1
 reps.rd  <- 10
 mins     <- c()
@@ -36,7 +55,7 @@ wod2 <- data.frame("x_min" = mins,
 
 breaks.rx <- c(mins[2:11]-1, maxs[1:11])
 
-# 15.2 by gender
+# Plot 15.2 Rx histogram by gender
 ggplot(leaderboard.15[wod=="15.2" & scaled =="Rx" & !is.na(score),]) +
   geom_rect(data=wod2, aes(xmin=x_min, xmax=x_max+1), 
             ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
@@ -49,35 +68,9 @@ ggplot(leaderboard.15[wod=="15.2" & scaled =="Rx" & !is.na(score),]) +
   theme(legend.position = "none")
 ggsave(filename="~/Desktop/crossfit_15.2_hist_gender.png",width=10, height=6)
 
-leaderboard.15[wod == "15.2" & scaled == "Rx" & !is.na(score), sum(score == 10)]
-leaderboard.15[wod == "15.2" & scaled == "Rx" & !is.na(score) & gender == "Men", sum(score == 10) / .N]
-leaderboard.15[wod == "15.2" & scaled == "Rx" & !is.na(score) & gender == "Women", sum(score == 10) / .N]
-
-leaderboard.15[wod == "15.2" & !is.na(score), sum(scaled=="Scaled") / .N]
-
-percentiles.14.15 <- rbind(leaderboard.14[!is.na(score) & stage == 2, 
-                                          as.list(quantile(score, c(.5, .75, .95))), 
-                                          by = list(gender = division)],
-                          leaderboard.15[!is.na(score) & wod == "15.2" & scaled == "Rx", 
-                                         as.list(quantile(score, c(.5, .75, .95))), 
-                                         by = gender])
-
-percentiles.14.15[, year := c("14.2","14.2","15.2","15.2")]
-percentiles.14.15[, gender := c("Men","Women")]
-
-ggplot(melt(percentiles.14.15, id.vars=c("year","gender")),
-       aes(variable,value, fill=year)) + 
-  geom_bar(stat="identity", position="dodge") + 
-  geom_text(aes(label=value), position = position_dodge(width=1), hjust=1.2) + 
-  scale_fill_manual(values=c("#a6cee3","#b2df8a")) + 
-  scale_y_continuous(limits = c(0,208),
-                     breaks = breaks.rx)+
-  facet_grid(gender~.) +
-  labs(x="Percentile",y="Score to acheive percentile", color="WOD", title="Crossfit Open 14.2 & 15.2 Percentile Thresholds (Rx)") + 
-  coord_flip()+
-  theme_bw(base_size=14)
-ggsave(filename="~/Desktop/crossfit_14.2_15.2_percentiles.png",width=10, height=5)
-
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 15.2 Scaled Plot and Descriptive Stats ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 15.2 scaled
 rep.ct   <- 1
 reps.rd  <- 6
@@ -95,10 +88,10 @@ for(i in 1:20){
 }
 
 wod2.scaled <- data.frame("x_min" = mins,
-                   "x_max" = maxs)
+                          "x_max" = maxs)
 breaks.scaled <- c(mins[2:13]-1, maxs[1:13])
 
-# 15.2 scaled
+# 15.2 scaled histogram by gender
 ggplot(leaderboard.15[wod=="15.2" & scaled =="Scaled" & !is.na(score),]) +
   geom_rect(data=wod2.scaled, aes(xmin=x_min, xmax=x_max+1), 
             ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
@@ -111,17 +104,56 @@ ggplot(leaderboard.15[wod=="15.2" & scaled =="Scaled" & !is.na(score),]) +
   theme(legend.position = "none")
 ggsave(filename="~/Desktop/crossfit_15.2.scaled_hist_gender.png",width=10, height=6)
 
+# Percentage of athletes who got stuck on the pullups by gender and division
+leaderboard.15[wod == "15.2" & scaled == "Rx" & !is.na(score), sum(score == 10)]
+leaderboard.15[wod == "15.2" & scaled == "Rx" & !is.na(score) & gender == "Men", sum(score == 10) / .N]
+leaderboard.15[wod == "15.2" & scaled == "Rx" & !is.na(score) & gender == "Women", sum(score == 10) / .N]
 
+# Percentage of athletes who opted for the scaled version of 15.2
+leaderboard.15[wod == "15.2" & !is.na(score), sum(scaled=="Scaled") / .N]
+
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Comarison of 14.2 to 15.2 ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Percentile thresholds in 14.2 vs 15.2
+percentiles.14.15 <- rbind(leaderboard.14[!is.na(score) & stage == 2, 
+                                          as.list(quantile(score, c(.5, .75, .95))), 
+                                          by = list(gender = division)],
+                          leaderboard.15[!is.na(score) & wod == "15.2" & scaled == "Rx", 
+                                         as.list(quantile(score, c(.5, .75, .95))), 
+                                         by = gender])
+percentiles.14.15[, year := c("14.2","14.2","15.2","15.2")]
+percentiles.14.15[, gender := c("Men","Women")]
+
+# Plot of percentile thresholds by year and gender
+ggplot(melt(percentiles.14.15, id.vars=c("year","gender")),
+       aes(variable,value, fill=year)) + 
+  geom_bar(stat="identity", position="dodge") + 
+  geom_text(aes(label=value), position = position_dodge(width=1), hjust=1.2) + 
+  scale_fill_manual(values=c("#a6cee3","#b2df8a")) + 
+  scale_y_continuous(limits = c(0,208),
+                     breaks = breaks.rx)+
+  facet_grid(gender~.) +
+  labs(x="Percentile",y="Score to acheive percentile", color="WOD", title="Crossfit Open 14.2 & 15.2 Percentile Thresholds (Rx)") + 
+  coord_flip()+
+  theme_bw(base_size=14)
+ggsave(filename="~/Desktop/crossfit_14.2_15.2_percentiles.png",width=10, height=5)
+
+# compile scores across years for returning athletes
 compare.1415 <- merge(leaderboard.15[stage == 2 & !is.na(score) & scaled == "Rx",
                                     list(athlete_id, score_152 = score, gender)],
                      leaderboard.14[stage == 2 & !is.na(score),
                                     list(athlete_id, score_142 = score)],
                      by="athlete_id")
 
+# calculate year-over-year delta for each athlete
 compare.1415[, delta := score_152 - score_142]
 
+# report overall mean
 compare.1415[, mean(delta)]
 
+# plot individual scores 14.2 vs 15.2
 ggplot(compare.1415, aes(score_142, score_152, color=gender)) + 
   geom_abline(yintercept=0, slope=1) + 
   geom_point(shape=1, alpha = .1) + 
@@ -135,7 +167,7 @@ ggplot(compare.1415, aes(score_142, score_152, color=gender)) +
   theme_bw(base_size=14) + theme(legend.position="none", panel.grid.minor = element_blank())
 ggsave(filename="~/Desktop/crossfit_15.2_14.2_gender.png",width=10, height=8)
 
-  
+# plot histogram of deltas
 ggplot(compare.1415, aes(delta, fill = gender)) + 
   geom_histogram(binwidth=1) + 
   geom_vline(xintercept=0) + 
@@ -146,13 +178,16 @@ ggplot(compare.1415, aes(delta, fill = gender)) +
   theme(legend.position = "none")
 ggsave(filename="~/Desktop/crossfit_15.2_delta_gender.png",width=10, height=6)
 
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### 15.2 Performance by Profile Stats: Age, Height, Weight ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+# merge in profile stats with leaderboard scores
 leaderboard.15 <- merge(leaderboard.15, 
                         athletes[, list(athlete_id, age, height, weight)], 
                         by="athlete_id", all.x=T)
 
-#### AGE
+### Age
 scores.age <- leaderboard.15[wod=="15.2" & scaled =="Rx" & !is.na(score),
                              list(score_avg = mean(score),
                                   n_athletes = .N),
@@ -170,7 +205,7 @@ ggplot(scores.age[age >= 17 & age <=55 & !is.na(age)],
 ggsave(filename="~/Desktop/crossfit_15.2_age.png",width=10, height=6)
 
 
-#### HEIGHT
+### Height
 scores.height <- leaderboard.15[wod=="15.2" & scaled =="Rx" & !is.na(score) & 
                                   12*4.5 <= height & height <= 12*7.5,
                              list(score_avg = mean(score),
@@ -189,8 +224,7 @@ ggplot(scores.height[score_avg < 150],
   theme_bw(base_size = 14)
 ggsave(filename="~/Desktop/crossfit_15.2_height.png",width=10, height=6)
 
-
-#### WEIGHT
+### Weight
 scores.weight <- leaderboard.15[wod=="15.2" & scaled =="Rx" & !is.na(score),
                                 list(score_avg = mean(score),
                                      n_athletes = .N),

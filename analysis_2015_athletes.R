@@ -1,12 +1,31 @@
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Summarize profile data from athletes in 2015 Open
+###
+### Notes:
+###  * uses data scraped by scrape_athletes.R and scrape_leaderboard.R
+###  * used to create this post:
+###    swift.pw/data/whats-normal-or-top-5-for-a-crossfit-athlete
+###
+### Primary Creator(s): Sam Swift (samswift@gmail.com)
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 library(ggplot2)
 library(scales)
 library(data.table)
 library("xtable")
 
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Load and Clean Data ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# binary data files saved from database using export_data.R
 load("data/athletes.RData")
 load("data/leaderboard.15.RData")
 
+# subset to 2015 athletes
 athletes <- athletes[athlete_id %in% leaderboard.15[, unique(athlete_id)]]
+
+# fix data issues
 athletes <- athletes[!is.na(gender)]
 athletes[, age:=as.integer(age)]
 
@@ -30,8 +49,9 @@ athletes[33     >= deadlift | deadlift >= 750,    deadlift:= NA]
 athletes[33     >= backsq   | backsq   >= 750,    backsq:= NA]
 athletes[0      >= pullups  | pullups  >= 150,    pullups:= NA]
 
-
-# Summarize each profile variable by gender
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Summarize each profile variable by gender ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 athletes.long <- melt(athletes[, c(1,6:21), with=F], 
                       id.vars = c("athlete_id", "gender"))
 
@@ -53,13 +73,9 @@ for(measure in athlete.summary[, unique(variable)]){
   print(xtable(sub.table, digits=0), type="html",html.table.attributes = "style='width:600px'", include.rownames=FALSE)
 }
 
-
-# descriptive claims
-
-
-
-
-### Histograms by profile stats
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#### Generate histogram by gender of each stat ####
+####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 GenderHist <-function(variable, binwidth=1, limits, breaks, labels=breaks, xlab){
   ggplot(athletes[gender %in% c("Male", "Female")], 
          aes_string(x=variable, fill="gender")) +
@@ -167,13 +183,6 @@ plots <- list(list(variable = "age",
 
 
 for(p in plots){
-  #   p <- plots[[10]]
-  #   p <- list(variable = "pullups",
-  #            binwidth = 1,
-  #            limits   = c(0,80),
-  #            breaks   = seq(0,80,5),
-  #            labels   = seq(0,80,5),
-  #            xlab     = "Pull Ups")
   ggsave(width=10, height=6,
          plot=GenderHist(variable = p$variable,
                          binwidth = p$binwidth,
