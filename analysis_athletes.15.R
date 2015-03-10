@@ -44,6 +44,7 @@ athlete.summary <- athletes.long[!is.na(value),
 setkeyv(athlete.summary, c("variable","gender"))
 athlete.summary[, variable := NULL]
 
+# print html tables
 for(measure in athlete.summary[, unique(variable)]){
   message(measure)
   sub.table <- athlete.summary[variable == measure]
@@ -51,6 +52,12 @@ for(measure in athlete.summary[, unique(variable)]){
   setnames(sub.table, c("","# profiles", "Average","5th percentile","25th","50th","75th","95th"))
   print(xtable(sub.table, digits=0), type="html",html.table.attributes = "style='width:600px'", include.rownames=FALSE)
 }
+
+
+# descriptive claims
+
+
+
 
 ### Histograms by profile stats
 GenderHist <-function(variable, binwidth=1, limits, breaks, labels=breaks, xlab){
