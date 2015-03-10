@@ -16,5 +16,7 @@ Post(s):
 
  * [Where did you really stack up in the 2014 Crossfit Open WODs?](http://swift.pw/data/where-did-you-really-stack-up-in-the-2014-open-wods)
  * [WOD data: Crossfit Open 15.1](http://swift.pw/data/wod-data-crossfit-open-15-1)
+ * [What’s normal (or top 5%) for a CrossFit athlete?](http://swift.pw/data/whats-normal-or-top-5-for-a-crossfit-athlete)
+ * [WOD data: Crossfit Open 15.2](http://swift.pw/data/wod-data-crossfit-open-15-2)
 
 ![14.2](http://samswift.org/wp-content/uploads/2014/05/crossfit_14_2_annotated.png)
