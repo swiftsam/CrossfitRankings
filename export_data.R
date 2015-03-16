@@ -12,8 +12,11 @@ library(RMySQL)
 source("db_query.R")
 
 ExportWod <- function(year, stage){
+  obj.name <- paste("leaderboard",year,stage, sep=".")
   leaderboard <- QueryDB(paste0("SELECT * FROM leaderboard WHERE year = ", year, " AND stage = ",stage))
-  save(leaderboard, file=paste0("data/leaderboard.",year,".",stage,".RData"))
+  assign(obj.name, leaderboard)
+  save(list = c(obj.name), 
+       file=paste0("data/leaderboard.",year,".",stage,".RData"))
 }
 
 ExportAthletes <- function(){
