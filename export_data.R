@@ -14,10 +14,10 @@ source("db_query.R")
 ExportWod <- function(year, stage = NULL, file.type = ".RData"){
   if(is.null(stage)){
     obj.name  <- paste("leaderboard",year, sep=".")
-    query     <- paste0("SELECT * FROM leaderboard WHERE year = ", year, " AND stage = ",stage)
+    query     <- paste0("SELECT * FROM leaderboard WHERE year = ", year)
   } else {
     obj.name  <- paste("leaderboard",year,stage, sep=".")
-    query     <- paste0("SELECT * FROM leaderboard WHERE year = ", year)
+    query     <- paste0("SELECT * FROM leaderboard WHERE year = ", year, " AND stage = ",stage)
   }
   file.name   <- paste0("data/",obj.name,file.type)
   
