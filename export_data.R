@@ -11,12 +11,25 @@ library(RMySQL)
 
 source("db_query.R")
 
-ExportWod <- function(year, stage){
-  obj.name <- paste("leaderboard",year,stage, sep=".")
-  leaderboard <- QueryDB(paste0("SELECT * FROM leaderboard WHERE year = ", year, " AND stage = ",stage))
+ExportWod <- function(year, stage = NULL, file.type = ".RData"){
+  if(is.null(stage)){
+    obj.name  <- paste("leaderboard",year, sep=".")
+    query     <- paste0("SELECT * FROM leaderboard WHERE year = ", year, " AND stage = ",stage)
+  } else {
+    obj.name  <- paste("leaderboard",year,stage, sep=".")
+    query     <- paste0("SELECT * FROM leaderboard WHERE year = ", year)
+  }
+  file.name   <- paste0("data/",obj.name,file.type)
+  
+  leaderboard <- QueryDB(query)
   assign(obj.name, leaderboard)
-  save(list = c(obj.name), 
-       file=paste0("data/leaderboard.",year,".",stage,".RData"))
+  if(file.type == ".RData"){
+    save(list = c(obj.name), file=file.name)
+  } else if(file.type == ".csv"){
+    write.csv(x         = get(obj.name),
+              file      = file.name,
+              row.names = F)
+  }
 }
 
 ExportAthletes <- function(){
