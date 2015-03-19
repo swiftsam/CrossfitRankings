@@ -32,8 +32,13 @@ ExportWod <- function(year, stage = NULL, file.type = ".RData"){
   }
 }
 
-ExportAthletes <- function(){
+ExportAthletes <- function(file.type = ".RData"){
   athletes <- QueryDB("SELECT * FROM athletes WHERE 1;")
-  save(athletes, file="data/athletes.RData")
+  
+  if(file.type == ".RData"){
+    save(athletes, file = "data/athletes.RData")
+  } else if(file.type == ".csv"){
+    write.csv(athletes, "data/athletes.csv", row.names = F)
+  }
 }
 
