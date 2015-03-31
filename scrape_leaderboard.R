@@ -20,7 +20,7 @@ ScrapeLeaderboard <- function(){
       page     <- pages[i, pages]
       score.type <- "points"
       if((year == 14 & stage == 5) | 
-          year == 15 & state == 5) { 
+          year == 15 & stage == 5) { 
         score.type <- "time"
       }
       
