@@ -32,6 +32,7 @@ ExportWod <- function(year, stage = NULL, file.type = c("csv","RData","zip")){
               row.names = F)
   }
   if("zip" %in% file.type){
+    rm(obj.name)
     system(paste0("zip ",file.path,".zip ", file.path,".csv"))
   }
 }
