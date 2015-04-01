@@ -11,7 +11,7 @@ library(RMySQL)
 
 source("db_query.R")
 
-ExportWod <- function(year, stage = NULL, file.type = c("csv","RData","zip")){
+ExportWod <- function(year, stage = NULL, file.type = c("csv","RData")){
   if(is.null(stage)){
     obj.name  <- paste("leaderboard",year, sep=".")
     query     <- paste0("SELECT * FROM leaderboard WHERE year = ", year)
@@ -30,10 +30,6 @@ ExportWod <- function(year, stage = NULL, file.type = c("csv","RData","zip")){
     write.csv(x         = get(obj.name),
               file      = paste0(file.path, ".csv"),
               row.names = F)
-  }
-  if("zip" %in% file.type){
-    rm(obj.name)
-    system(paste0("zip ",file.path,".zip ", file.path,".csv"))
   }
 }
 
