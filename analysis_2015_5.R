@@ -18,20 +18,8 @@ library(scales)
 #### Load and Clean Data ####
 ####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # binary data files saved from database using export_data.R
-load("data/leaderboard.15.1.RData")
-load("data/leaderboard.15.1.1.RData")
-load("data/leaderboard.15.2.RData")
-load("data/leaderboard.15.3.RData")
-load("data/leaderboard.15.4.RData")
-load("data/leaderboard.15.5.RData")
+load("data/leaderboard.15.RData")
 load("data/athletes.RData")
-
-leaderboard.15 <- rbindlist(list(leaderboard.15.1,
-                                 leaderboard.15.1.1,
-                                 leaderboard.15.2,
-                                 leaderboard.15.3,
-                                 leaderboard.15.4,
-                                 leaderboard.15.5))
 
 # create factors
 leaderboard.15[, gender := factor(division, levels=2:1, labels=c("Women","Men"), ordered=TRUE)]
@@ -57,6 +45,16 @@ participation.wod <- leaderboard.15[,
 participation.wod[, p_participated := n_participated / n_total]
 participation.wod[, p_scaled := n_scaled / n_participated]
 
+participated.total <- leaderboard.15[,length(unique(athlete_id))]
+
+leaderboard.15[, list(complete = sum(!is.na(score)) == 6), 
+                by=athlete_id][complete == TRUE,length(unique(athlete_id))]
+
+leaderboard.15[scaled == "Rx", 
+               list(complete = sum(!is.na(score)) == 6), 
+               by=athlete_id][complete == TRUE,length(unique(athlete_id))]
+
+
 ggplot(participation.wod[wod != "15.1A"], 
        aes(wod, n_participated, fill=gender))+
   geom_bar(stat="identity") + 
@@ -64,34 +62,28 @@ ggplot(participation.wod[wod != "15.1A"],
   geom_text(aes(y=n_scaled,
                 label=paste0(round(p_scaled,2)*100,"%")),vjust=2) + 
   geom_text(aes(y=n_participated,
-                label=n_participated),vjust=2) + 
+                label=format(n_participated,big.mark = ",")),vjust=2) + 
   scale_alpha_manual(values = c(.4,1)) + 
   scale_y_continuous(labels=comma, breaks=seq(0,150000,25000)) + 
   labs(x="2015 WoD", y="# Athletes",
        title="CrossFit Open 2015 Participation and Scaled vs Rx") +
   facet_grid(.~gender, scales="free") + 
   theme_bw()
-ggsave(filename="~/Desktop/crossfit_15.5_participation.png",width=10, height=6)
-
-leaderboard.15[scaled == "Rx" & !is.na(score), 
-               list(gender, rx = .N == 4), 
-               by=athlete_id][,sum(rx==TRUE) / .N, by=gender]
+ggsave(filename="~/Desktop/crossfit_15.5_participation.png",width=12, height=6)
 
 ####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #### 15.5 Rx Histogram and Percentile plot ####
 ####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-breaks.rx <- data.table("reps" = cumsum(c(3,3,6,3,9,3,12,6,15,6,18,6,21,9,27,9))+1)
-rounds.rx <- data.table("x_min" = breaks.rx[seq(1,15,2), reps],
-                        "x_max" = breaks.rx[seq(2,16,2), reps-1])
+breaks.rx <- data.table("reps" = seq(60*5, 60*30, 60)+1)
 
 ggplot(leaderboard.15[wod=="15.5" & scaled =="Rx" & !is.na(score),]) +
-  geom_rect(data=rounds.rx, aes(xmin=x_min, xmax=x_max+1), 
-            ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
-  geom_vline(data=breaks.rx, aes(xintercept = reps), color="darkgrey", alpha=.7) + 
   geom_histogram(aes(x=score, fill=gender), binwidth=1)+
-  scale_x_continuous(limits = c(0,148),
-                     breaks = breaks.rx[,reps])+
-  labs(x="15.5 Score",y="# of Athletes", title="Crossfit Open 15.5 Scores (Rx)") +
+  scale_x_continuous(limits = range(breaks.rx[,reps]),
+                     breaks = breaks.rx[,reps],
+                     labels = seq(5, 30, 1))+
+  labs(x = "15.5 Time (minutes)",
+       y = "# of Athletes", 
+       title = "Crossfit Open 15.5 Scores (Rx)") +
   facet_grid(gender~.,scale="free_y") +
   theme_bw(base_size=14) +
   theme(legend.position = "none", panel.grid.minor.x = element_blank(), axis.text.x = element_text(angle = 90, hjust = 1))
@@ -102,41 +94,60 @@ percentiles.rx <- melt(leaderboard.15[wod=="15.5" & scaled =="Rx" & !is.na(score
                                                        seq(.01,.99,.01))), 
                                       by=gender],
                        id.vars = "gender", variable.name="percentile", value.name="score_cutoff")
-percentiles.rx[, percentile := as.numeric(percentile)/100]
+percentiles.rx[, percentile := 1 - (as.numeric(percentile)/100)]
 ggplot(percentiles.rx) + 
-  geom_rect(data=rounds.rx, aes(xmin=x_min, xmax=x_max+1), 
-            ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
-  geom_vline(data=breaks.rx, aes(xintercept = reps), color="darkgrey", alpha=.7) + 
   geom_line(aes(score_cutoff, percentile, color=gender), size=2) + 
   scale_y_continuous(labels=percent) + 
-  scale_x_continuous(limits = c(0,148),
-                     breaks = breaks.rx[,reps])+
-  labs(x="15.5 Score (Rx)",y="Percentile", title="Crossfit Open 15.5 Percentile and Scores (Rx)") +
+  scale_x_continuous(limits = range(breaks.rx[,reps]),
+                     breaks = breaks.rx[,reps],
+                     labels = seq(5, 30, 1))+
+  labs(x = "15.5 Time (minutes)",
+       y = "Percentile", 
+       title = "CrossFit Open 15.5 Percentile and Scores (Rx)") +
   theme_bw() + 
   theme(legend.position = "none", panel.grid.minor.x = element_blank(), axis.text.x = element_text(angle = 90, hjust = 1))
 ggsave(filename="~/Desktop/crossfit_15.5rx_percentile_gender.png",width=10, height=6)
 
-leaderboard.15[!is.na(score) & scaled == "Rx" & wod=="15.5" & score == 3, .N, by = gender]
+scores.seconds.rx <- leaderboard.15[wod=="15.5" & scaled =="Rx" & !is.na(score), 
+                                 list(score, mod_score = score %% 60, gender)]
+
+freq.seconds.gender.rx <- scores.seconds.rx[, list(n_athletes = .N), 
+                                             by=list(mod_score, gender)]
+freq.seconds.gender.rx[, per_athletes := n_athletes / sum(n_athletes), by=gender ]
+
+ggplot(freq.seconds.gender.rx,
+       aes(mod_score, per_athletes, color=gender)) +
+  geom_point(size=5, alpha=.4) +
+  geom_point(size=5, shape=21, alpha=1) +
+  geom_smooth(method="lm", se=F) + 
+  scale_y_continuous(labels=percent)+
+  scale_x_continuous(breaks=seq(0,60,5)) +
+  labs(title = "CrossFit Open 15.5 Finishing Time Seconds",
+       x = "Finishing Time Seconds (:SS)", 
+       y = "% Athletes") + 
+  theme_bw()
+ggsave(filename="~/Desktop/crossfit_15.5rx_seconds.png",width=10, height=6)
+
+
+scores.seconds.rx[mod_score %between% c(50,59), .N] / 
+  scores.seconds.rx[mod_score %between% c(1,10), .N]
 
 ####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #### 15.5 Scaled Histogram ####
 ####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-breaks.sc <- data.table("reps" = c(1,seq(10,170,10)+1))
-rounds.sc <- data.table("x_min" = breaks.sc[seq(1,17,2), reps],
-                        "x_max" = breaks.sc[seq(2,18,2), reps-1])
+breaks.sc <- data.table("reps" = seq(60*5, 60*30, 60)+1)
 
 ggplot(leaderboard.15[wod=="15.5" & scaled =="Scaled" & !is.na(score),]) +
-  geom_rect(data=rounds.sc, aes(xmin=x_min, xmax=x_max+1), 
-            ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
-  geom_vline(data=breaks.sc, aes(xintercept = reps), color="darkgrey", alpha=.5) + 
   geom_histogram(aes(x=score, fill=gender), binwidth=1)+
-  scale_x_continuous(limits = c(0,171),
-                     breaks = breaks.sc[,reps])+
-  labs(x="15.5 Score",y="# of Athletes", title="Crossfit Open 15.5 Scores (Scaled)") +
+  scale_x_continuous(limits = range(breaks.sc[,reps]),
+                     breaks = breaks.sc[,reps],
+                     labels = seq(5, 30, 1))+
+  labs(x = "15.5 Time (minutes)",
+       y = "# of Athletes", 
+       title = "Crossfit Open 15.5 Scores (Scaled)") +
   facet_grid(gender~.,scale="free_y") +
   theme_bw(base_size=14) +
-  theme(legend.position = "none", panel.grid.minor.x = element_blank())
+  theme(legend.position = "none", panel.grid.minor.x = element_blank(), axis.text.x = element_text(angle = 90, hjust = 1))
 ggsave(filename="~/Desktop/crossfit_15.5sc_hist_gender.png",width=10, height=6)
 
 percentiles.sc <- melt(leaderboard.15[wod=="15.5" & scaled =="Scaled" & !is.na(score), 
@@ -144,18 +155,18 @@ percentiles.sc <- melt(leaderboard.15[wod=="15.5" & scaled =="Scaled" & !is.na(s
                                                        seq(.01,.99,.01))), 
                                       by=gender],
                        id.vars = "gender", variable.name="percentile", value.name="score_cutoff")
-percentiles.sc[, percentile := as.numeric(percentile)/100]
+percentiles.sc[, percentile := 1 - (as.numeric(percentile)/100)]
 ggplot(percentiles.sc) + 
-  geom_rect(data=rounds.sc, aes(xmin=x_min, xmax=x_max+1), 
-            ymin=0, ymax=10000, alpha=0.2, fill="grey60") +
-  geom_vline(data=breaks.sc, aes(xintercept = reps), color="darkgrey", alpha=.7) + 
   geom_line(aes(score_cutoff, percentile, color=gender), size=2) + 
   scale_y_continuous(labels=percent) + 
-  scale_x_continuous(limits = c(0,171),
-                     breaks = breaks.sc[,reps])+
-  labs(x="15.5 Score (Scaled)",y="Percentile", title="Crossfit Open 15.5 Percentile and Scores (Scaled)") +
+  scale_x_continuous(limits = range(breaks.sc[,reps]),
+                     breaks = breaks.sc[,reps],
+                     labels = seq(5, 30, 1))+
+  labs(x = "15.5 Time (minutes)",
+       y = "Percentile", 
+       title = "Crossfit Open 15.5 Percentile and Scores (Scaled)") +
   theme_bw() + 
-  theme(legend.position = "none", panel.grid.minor.x = element_blank())
+  theme(legend.position = "none", panel.grid.minor.x = element_blank(), axis.text.x = element_text(angle = 90, hjust = 1))
 ggsave(filename="~/Desktop/crossfit_15.5sc_percentile_gender.png",width=10, height=6)
 
 ####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,7 +179,7 @@ leaderboard.15 <- merge(leaderboard.15,
                         by="athlete_id", all.x=T)
 
 leaderboard.15[!is.na(score), 
-               percentile := rank(score) / .N, 
+               percentile := 1 - (rank(score) / .N), 
                by=list(wod, gender, scaled)]
 
 ### Age
@@ -255,7 +266,7 @@ ggplot(scores.height.weight[n_athletes > 10],
   scale_y_continuous(breaks = seq(100,300, 20)) +
   scale_size_continuous(range = c(4,8)) +
   scale_fill_brewer(palette = "RdYlGn") + 
-  labs(x="Height (ft, in)", y="Weight (10 lb bins)", fill="Average Percentile",
+  labs(x="Height (ft, in)", y="Weight (10 lb bins)", fill="Average\nPercentile",
        title="Crossfit Open 15.5 Percentile by Height & Weight") + 
   theme_bw(base_size = 14) + 
   facet_grid(scaled ~ gender, scales = "free",space = "free")
