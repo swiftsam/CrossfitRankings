@@ -68,9 +68,12 @@ ggplot(participation.wod[wod != "15.1A"],
   theme_bw()
 ggsave(filename="~/Desktop/crossfit_15.3_participation.png",width=10, height=6)
 
-leaderboard.15[scaled == "Rx" & !is.na(score), 
-               list(gender, rx = .N == 4), 
-               by=athlete_id][,sum(rx==TRUE) / .N, by=gender]
+rx.athlete <- leaderboard.15[scaled == "Rx" & !is.na(score), 
+                             list(n_rx = .N,
+                                  gender = head(gender,1)), 
+                             by=athlete_id]
+
+rx.athlete[, .N, by=list(gender,n_rx)]
 
 ####~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #### 15.3 Rx Histogram and Percentile plot ####
