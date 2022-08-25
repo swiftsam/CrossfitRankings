@@ -19,4 +19,4 @@ Post(s):
  * [What’s normal (or top 5%) for a CrossFit athlete?](http://swift.pw/whats-normal-or-top-5-for-a-crossfit-athlete)
  * [WOD data: Crossfit Open 15.2](http://swift.pw/wod-data-crossfit-open-15-2)
 
-![14.2]([http://samswift.org/wp-content/uploads/2014/05/](https://swift.pw/assets/images/posts/crossfit_14_2_annotated.png)
+![14.2](https://swift.pw/assets/images/posts/crossfit_14_2_annotated.png)
